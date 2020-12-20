@@ -6,15 +6,17 @@
 
 <!-- Page Content -->
 <div class="container">
-
-
     <!-- /.row -->
 
     <div class="row">
         <h4 class="text-center bg-danger"><?php display_message(); ?></h4>
         <h1>Checkout</h1>
-
-        <form action="">
+        <!-- form paypal -->
+        <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
+            <input type="hidden" name="cmd" value="_cart">
+            <input type="hidden" name="business" value="sb-pura44151859@business.example.com">
+            <input type="hidden" name="currency_code" value="USD">
+            <input type="hidden" name="upload" value="1">
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -29,6 +31,7 @@
                     <?php cart(); ?>
                 </tbody>
             </table>
+            <?php echo show_paypal_button(); ?>
         </form>
 
 
@@ -54,7 +57,7 @@
                 <tr class="order-total">
                     <th>Order Total</th>
                     <td><strong><span class="amount">&#36;
-                        <?php echo isset($_SESSION['item_total']) ? $_SESSION['item_total'] : $_SESSION['item_total'] = "0"; ?></span></strong>
+                                <?php echo isset($_SESSION['item_total']) ? $_SESSION['item_total'] : $_SESSION['item_total'] = "0"; ?></span></strong>
                     </td>
                 </tr>
 
