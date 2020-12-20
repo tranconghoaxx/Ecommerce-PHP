@@ -2,6 +2,7 @@
 // khoi dong qua trinh ghi cache vao bo dem khi can lay ra dung
 ob_start();
 session_start();
+// session_destroy();
 // dung duong dan cho ca window va linux
 defined("DS") ? null : define("DS", DIRECTORY_SEPARATOR); 
 defined("TEMPLATE_FRONT") ? null : define("TEMPLATE_FRONT", __DIR__ . DS . "templates/front");
