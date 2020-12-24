@@ -5,6 +5,7 @@ if(isset($_GET['add'])){
     confirm($query);
     while($row = fetch_array($query)){
         if($row['product_quantity'] != $_SESSION['product_' . $_GET['add']]){
+            // CART BEGIN
             $_SESSION['product_' . $_GET['add']] += 1;
             redirect("../public/checkout.php");
         }else{
@@ -95,6 +96,53 @@ function show_paypal_button(){
             alt="PayPal - The safer, easier way to pay online">
         DELIMETER;
         return $paypal_button;
+    }
+}
+function report(){
+    if(isset($_GET['tx'])){
+        $amount =  $_GET['amt'];
+        $currency =  $_GET['cc'];
+        $transaction =  $_GET['tx'];
+        $status = $_GET['st'];
+      
+
+        $total = 0;
+        $item_quantity=0;
+    
+        foreach($_SESSION as $name => $value){
+            if($value > 0) {
+                if(substr($name,0,8) == "product_"){
+                    // get id
+                    $length = strlen($name) - 8;
+                    $id = substr($name,8,$length);
+
+                    $send_order = query("INSERT INTO orders (order_amount,order_transaction,order_status,order_currency) VALUES ('{$amount }','{$transaction }','{$status }','{$currency }')");
+                    // lay id cua query cuoi cung de insert vao report thuoc id order nao?
+                    $last_id = last_id();
+                    confirm($send_order);
+                    
+
+                    $query = query("SELECT * FROM products WHERE product_id=" . escape_string($id) . "");
+                    confirm($query);
+                    while($row = fetch_array($query)){
+                        $product_price = $row['product_price'] ;
+                        $product_title = $row['product_title'] ;
+                        $sub = $row['product_price'] * $value;
+                        $item_quantity += $value;
+                        $insert_report = query("INSERT INTO reports (product_id,order_id,product_title,product_price,product_quantity) VALUES ('{$id }','{$last_id}','{$product_title}','{$product_price }','{$value }')");
+                        confirm($insert_report);
+                    }
+                        // total
+                    $total += $sub;
+                    // echo $item_quantity;
+                }
+
+            }
+
+        }
+          // session_destroy();
+    }else{
+        redirect("index.php");
     }
 
 }
