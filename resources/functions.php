@@ -155,5 +155,82 @@ function send_message(){
     }
 }
 //*************************BACK END FUNCTIONS */
+function display_orders(){
+    global $connection;
+    $query = "SELECT * FROM orders";
+    $send_query = mysqli_query($connection,$query);
+    if(!$send_query){
+        die("QUERY FAILED " + mysqli_error($connection));
+    }
+    while($row = mysqli_fetch_array($send_query)){
+        $orders = <<<DELIMETER
+                <tr>
+                    <th>{$row['order_id']}</th>
+                    <th>{$row['order_amount']}</th>
+                    <th>{$row['order_transaction']}</th>
+                    <th>{$row['order_currency']}</th>
+                    <th>{$row['order_status']}</th>
+                    <td><a class="btn btn-danger" href="../../resources/templates/back/delete_order.php?id={$row['order_id']}"><span class="glyphicon glyphicon-remove"></span></a></td>
+         
+                    
+                </tr>
+        DELIMETER;
+        echo $orders;
+    }
+}
+/*********************************Admin Product */
+function get_product_in_admin(){
+    $query = "SELECT * FROM products";
+    $send_query = mysqli_query(mysqli_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME),$query);
+    if(!$send_query){
+        die("Query Failed " . mysqli_error(mysqli_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME)));
+    }
+    while($row = mysqli_fetch_array($send_query)){
+        $product = <<<DELIMETER
+            <tr>
+                <td>{$row['product_id']}</td>
+                <td>{$row['product_title']} <br>
+                <a class="" href="index.php?edit_product&id={$row['product_id']}"><img src="{$row['product_image']}" alt=""></a>
+                </td>
+                <td>Category</td>
+                <td>{$row['product_price']}</td>
+                <td>{$row['product_quantity']}</td>
+                <td><a class="btn btn-danger" href="../../resources/templates/back/delete_product.php?id={$row['product_id']}"><span class="glyphicon glyphicon-remove"></span></a></td>
+            </tr>
+        DELIMETER;
+        echo $product;
+    }
+}
+/*********************************Add Product In Admin */
+function add_product(){
+    defined("DB_HOST") ? null : define('DB_HOST','localhost');
+    defined('DB_USER')? null : define("DB_USER",'root');
+    defined("DB_PASS") ? null : define("DB_PASS",'');
+    defined("DB_NAME")? null: define("DB_NAME","ecom_db");
+    $connection = mysqli_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME);
+    if(isset($_POST['publish'])){
+        $product_title = mysqli_real_escape_string($_POST['product_title']);
+        $product_category_id = mysqli_real_escape_string($_POST['product_category_id']);
+        $product_price = mysqli_real_escape_string($_POST['product_price']);
+        $product_description = mysqli_real_escape_string($_POST['product_description']);
+        $short_desc = mysqli_real_escape_string($_POST['short_desc']);
+        $product_quantity = mysqli_real_escape_string($_POST['product_quantity']);
+        $product_image = mysqli_real_escape_string($_FILES['file']['name']);
+        $image_temporary_location = mysqli_real_escape_string($_FILES['file']['tmp_name']);
+        difined("UPLOAD_DIRECTORY") ? null : define("UPLOAD_DIRECTORY", __DIR__ . DS . "uploads");
+        move_uploaded_file($image_temporary_location,UPLOAD_DIRECTORY . DS . $product_image);
 
+        $query = "INSERT INTO products (product_title,product_category_id,product_price,product_description,short_desc,product_quantity,product_image) VALUES('${product_title}','${product_category_id}','${product_price}','${product_description}','${short_desc},'${product_quantity}','${product_image}')";
+        $send_query = mysqli_query($connection,$query);
+        $last_id = mysqli_insert_id($connection);
+
+        if(!$send_query){
+            die("Failed Query add product " . mysqli_error($connection));
+        }
+        $_SESSION['message'] = "New Product with id {$last_id} was Added";
+        redirect("index.php?products");
+    
+
+    }
+}
 ?>
