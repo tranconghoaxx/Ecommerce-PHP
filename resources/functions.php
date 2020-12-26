@@ -209,28 +209,42 @@ function add_product(){
     defined("DB_NAME")? null: define("DB_NAME","ecom_db");
     $connection = mysqli_connect(DB_HOST,DB_USER,DB_PASS,DB_NAME);
     if(isset($_POST['publish'])){
-        $product_title = mysqli_real_escape_string($_POST['product_title']);
-        $product_category_id = mysqli_real_escape_string($_POST['product_category_id']);
-        $product_price = mysqli_real_escape_string($_POST['product_price']);
-        $product_description = mysqli_real_escape_string($_POST['product_description']);
-        $short_desc = mysqli_real_escape_string($_POST['short_desc']);
-        $product_quantity = mysqli_real_escape_string($_POST['product_quantity']);
-        $product_image = mysqli_real_escape_string($_FILES['file']['name']);
-        $image_temporary_location = mysqli_real_escape_string($_FILES['file']['tmp_name']);
-        difined("UPLOAD_DIRECTORY") ? null : define("UPLOAD_DIRECTORY", __DIR__ . DS . "uploads");
-        move_uploaded_file($image_temporary_location,UPLOAD_DIRECTORY . DS . $product_image);
-
-        $query = "INSERT INTO products (product_title,product_category_id,product_price,product_description,short_desc,product_quantity,product_image) VALUES('${product_title}','${product_category_id}','${product_price}','${product_description}','${short_desc},'${product_quantity}','${product_image}')";
+        $product_title = mysqli_real_escape_string($connection,$_POST['product_title']);
+        $product_category_id = mysqli_real_escape_string($connection,$_POST['product_category_id']);
+        $product_price = mysqli_real_escape_string($connection,$_POST['product_price']);
+        $product_description = mysqli_real_escape_string($connection,$_POST['product_description']);
+        $short_desc = mysqli_real_escape_string($connection,$_POST['short_desc']);
+        $product_quantity = mysqli_real_escape_string($connection,$_POST['product_quantity']);
+        $product_image = mysqli_real_escape_string($connection,$_FILES['file']['name']);
+        // dung cai nay khong the they file in folder
+        $image_temporary_location = mysqli_real_escape_string($connection,$_FILES['file']['tmp_name']);
+        defined("UPLOAD_DIRECTORY") ? null : define("UPLOAD_DIRECTORY", __DIR__ . DS . "uploads");
+        move_uploaded_file($_FILES["file"]["tmp_name"],UPLOAD_DIRECTORY . DS . $product_image);
+        $query = "INSERT INTO products (product_title,product_category_id,product_description,short_desc,product_price,product_quantity,product_image) VALUES('${product_title}','${product_category_id}','${product_description}','${short_desc}','${product_price}','${product_quantity}','${product_image}')";
         $send_query = mysqli_query($connection,$query);
         $last_id = mysqli_insert_id($connection);
-
         if(!$send_query){
+    
             die("Failed Query add product " . mysqli_error($connection));
         }
         $_SESSION['message'] = "New Product with id {$last_id} was Added";
         redirect("index.php?products");
     
 
+    }
+}
+function show_cate_add_product(){
+    global $connection;
+    $query = "SELECT * FROM categories";
+    $send_query = mysqli_query($connection,$query);
+    if(!$send_query){
+        die("failed show cate add product " . mysqli_error($connection));
+    }
+    while($row = mysqli_fetch_array($send_query)){
+        $categories_options = <<<DELIMETER
+            <option value="{$row['cat_id']}">{$row['cat_title']}</option>
+        DELIMETER;
+        echo $categories_options;
     }
 }
 ?>
