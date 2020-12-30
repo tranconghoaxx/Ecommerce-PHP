@@ -326,4 +326,43 @@ function update_product(){
         redirect("index.php?products");
     }
 }
+/****************Category in admin */
+function show_categories_in_admin(){
+    $query = "SELECT * FROM categories";
+    global $connection;
+    $category_query = mysqli_query($connection,$query);
+    if(!$category_query){
+        die("Failed query in showcate in admin " . mysqli_error($connection));
+
+    }
+    while($row = mysqli_fetch_array($category_query)){
+        $cat_id = $row['cat_id'];
+        $cat_title = $row['cat_title'];
+        $category = <<<DELIMETER
+                <tr>
+                <td>{$cat_id}</td>
+                <td>{$cat_title}</td>
+                <td><a class="btn btn-danger" href="../../resources/templates/back/delete_category.php?id={$row['cat_id']}"><span class="glyphicon glyphicon-remove"></span></a></td>
+                </tr>
+        DELIMETER;
+        echo $category;
+    }
+}
+function add_category(){
+    global $connection;
+    if(isset($_POST['add_category'])){
+        $cat_title = mysqli_real_escape_string($connection,$_POST['cat_title']);
+        if(empty($cat_title) || $cat_title == ' '){
+            echo "<p class='bg-danger' >THIS CAN NOT BE EMPTY </p>";
+        }else{
+            $query = "INSERT INTO categories(cat_title) VALUES('{$cat_title}') ";
+            $send_query = mysqli_query($connection,$query);
+            if(!$send_query){
+                die("Failed query in add category ". mysqli_error($connection));
+            }
+            $_SESSION['message'] = "CATEGORY CREATED";
+            // redirect("index.php?categories");
+        }
+    }
+}
 ?>
