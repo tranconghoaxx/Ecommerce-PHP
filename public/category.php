@@ -11,9 +11,7 @@
         <p><a class="btn btn-primary btn-large">Call to action!</a>
         </p>
     </header>
-
     <hr>
-
     <!-- Title -->
     <div class="row">
         <div class="col-lg-12">
